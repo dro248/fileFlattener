@@ -18,7 +18,6 @@ TODIR = sys.argv[2]
 
 class DirectoryFlattener:
 	def flatten(self, fromDir, toDir):
-		print("Starting flattening!")
 		# Check that fromDir and toDir are valid files
 		if not os.path.isdir(fromDir) or not os.path.isdir(toDir):
 			print("Error: parameters must be directories.")
@@ -27,17 +26,21 @@ class DirectoryFlattener:
 		self.recursiveCopy(fromDir, toDir)
 
 	def recursiveCopy(self, fromDir, toDir):
-		print("entered recursiveCopy:", fromDir, toDir)
+		# print("entered recursiveCopy:", fromDir, toDir)
 		for item in os.listdir(fromDir):
-			print(item)
-			if os.path.isdir(item):
-				self.recursiveCopy(item, toDir)
-			# elif os.path.isfile(item):
-			else:
+			if os.path.isdir(os.path.join(fromDir, item)):
+				# print("Item is directory")
+				# print(item)
+				self.recursiveCopy(os.path.join(fromDir, item), toDir)
+			
+			# else:
+			elif os.path.isfile(os.path.join(fromDir,item)):
+				# print("Item is a file")
+				# print("\t", item)
 				fileExt = os.path.splitext(item)[1]
 				newfilename = self.generateRandomFilename(fileExt)
 
-				print("newFilename:", newfilename)
+				# print("newFilename:", newfilename)
 
 				# If for some reason we're getting fn collisions, keep generating new random fns
 				# until we get on that doesn't exist.
@@ -53,4 +56,18 @@ class DirectoryFlattener:
 
 
 df = DirectoryFlattener()
-df.flatten(FROMDIR, TODIR)
+
+# df.flatten(FROMDIR, TODIR)
+
+for countryName in os.listdir(FROMDIR):
+	print("Country Name:", countryName)
+
+	# create a filename for the subfolder in FROMDIR
+	fromdir_country = os.path.join(FROMDIR, countryName)
+
+	# create a filename for the subfolder in TODIR (that we'll be creating)
+	todir_country = os.path.join(TODIR, countryName)
+
+	# Create a subfolder (todir_country) with this given name in TODIR
+	os.makedirs(todir_country)
+	df.flatten(fromdir_country, todir_country)
