@@ -5,17 +5,6 @@ import string
 import shutil
 import argparse
 
-print(sys.argv)
-
-if(len(sys.argv) < 3):
-	print("Not enough args")
-	print("usage: python3 flatten.py FROMDIR TODIR")
-	sys.exit()
-
-FROMDIR = sys.argv[1]
-TODIR = sys.argv[2]
-
-
 class DirectoryFlattener:
 	def flatten(self, fromDir, toDir):
 		# Check that fromDir and toDir are valid files
@@ -32,7 +21,7 @@ class DirectoryFlattener:
 				# print("Item is directory")
 				# print(item)
 				self.recursiveCopy(os.path.join(fromDir, item), toDir)
-			
+
 			# else:
 			elif os.path.isfile(os.path.join(fromDir,item)):
 				# print("Item is a file")
@@ -46,7 +35,7 @@ class DirectoryFlattener:
 				# until we get on that doesn't exist.
 				while os.path.isfile(newfilename):
 					newfilename = self.generateRandomFilename(fileExt)
-				
+
 				# copy the item to the new location with the new randomly generated filename.
 				shutil.copyfile(os.path.join(fromDir, item), os.path.join(toDir, newfilename))
 
@@ -55,19 +44,31 @@ class DirectoryFlattener:
 		return prefix + fileExt
 
 
-df = DirectoryFlattener()
+def parse_options():
+	parser = argparse.ArgumentParser(prog="flatten", description="flatten files", add_help=True)
 
-# df.flatten(FROMDIR, TODIR)
+	parser.add_argument("FROMDIR", help="Source Directory")
+	parser.add_argument("TODIR", help="Destination Directory")
+	return parser.parse_args()
 
-for countryName in os.listdir(FROMDIR):
-	print("Country Name:", countryName)
+if __name__ == "__main__":
+	args = parse_options()
+	FROMDIR = args.FROMDIR
+	TODIR = args.TODIR
 
-	# create a filename for the subfolder in FROMDIR
-	fromdir_country = os.path.join(FROMDIR, countryName)
+	df = DirectoryFlattener()
 
-	# create a filename for the subfolder in TODIR (that we'll be creating)
-	todir_country = os.path.join(TODIR, countryName)
+	for countryName in os.listdir(FROMDIR):
+		print("Country Name:", countryName)
 
-	# Create a subfolder (todir_country) with this given name in TODIR
-	os.makedirs(todir_country)
-	df.flatten(fromdir_country, todir_country)
+		# create a filename for the subfolder in FROMDIR
+		fromdir_country = os.path.join(FROMDIR, countryName)
+
+		# create a filename for the subfolder in TODIR (that we'll be creating)
+		todir_country = os.path.join(TODIR, countryName)
+
+		# Create a subfolder (todir_country) with this given name in TODIR
+		os.makedirs(todir_country)
+		df.flatten(fromdir_country, todir_country)
+
+
